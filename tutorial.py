@@ -1,10 +1,14 @@
 import pygame
+import PygameUtils as pu
 import math
 pygame.init()
 
 WIDTH, HEIGHT =  800, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Planet Simulation")
+
+checkbox_normal = pygame.image.load('img/checkbox_normal.png')
+checkbox_checked = pygame.image.load('img/checkbox_checked.png')
 
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
@@ -20,12 +24,13 @@ class Planet:
 	SCALE = 250 / AU  # 1AU = 100 pixels
 	TIMESTEP = 3600*24 # 1 day
 
-	def __init__(self, x, y, radius, color, mass):
+	def __init__(self, x, y, radius, color, mass, name):
 		self.x = x
 		self.y = y
 		self.radius = radius
 		self.color = color
 		self.mass = mass
+		self.name = name
 
 		self.orbit = []
 		self.sun = False
@@ -50,9 +55,11 @@ class Planet:
 
 		pygame.draw.circle(win, self.color, (x, y), self.radius)
 		
-		if not self.sun:
+		name_text = FONT.render(self.name, 1, WHITE)
+		win.blit(name_text, (x - name_text.get_width()/2, y - name_text.get_height()/2))
+		"""if not self.sun:
 			distance_text = FONT.render(f"{round(self.distance_to_sun/1000, 1)}km", 1, WHITE)
-			win.blit(distance_text, (x - distance_text.get_width()/2, y - distance_text.get_height()/2))
+			win.blit(distance_text, (x - distance_text.get_width()/2, y - distance_text.get_height()/2))"""
 
 	def attraction(self, other):
 		other_x, other_y = other.x, other.y
@@ -86,31 +93,37 @@ class Planet:
 		self.y += self.y_vel * self.TIMESTEP
 		self.orbit.append((self.x, self.y))
 
+def disp_checkbox_normal(x,y):
+    WIN.blit(checkbox_normal, (x,y))
+	
+def disp_checkbox_checked(x,y):
+    WIN.blit(checkbox_checked, (x,y))
+
 
 def main():
 	run = True
 	clock = pygame.time.Clock()
 
-	sun = Planet(0, 0, 30, YELLOW, 1.98892 * 10**30)
+	sun = Planet(0, 0, 30, YELLOW, 1.98892 * 10**30, "Sun")
 	sun.sun = True
 
-	earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.9742 * 10**24)
+	earth = Planet(-1 * Planet.AU, 0, 16, BLUE, 5.9742 * 10**24, "Earth")
 	earth.y_vel = 29.783 * 1000 
 
-	mars = Planet(-1.524 * Planet.AU, 0, 12, RED, 6.39 * 10**23)
+	mars = Planet(-1.524 * Planet.AU, 0, 12, RED, 6.39 * 10**23, "Mars")
 	mars.y_vel = 24.077 * 1000
 
-	mercury = Planet(0.387 * Planet.AU, 0, 8, DARK_GREY, 3.30 * 10**23)
+	mercury = Planet(0.387 * Planet.AU, 0, 8, DARK_GREY, 3.30 * 10**23, "Mercury")
 	mercury.y_vel = -47.4 * 1000
 
-	venus = Planet(0.723 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**24)
+	venus = Planet(0.723 * Planet.AU, 0, 14, WHITE, 4.8685 * 10**24, "Venus")
 	venus.y_vel = -35.02 * 1000
 
 	planets = [sun, earth, mars, mercury, venus]
 
 	while run:
 		clock.tick(60)
-		WIN.fill((0, 0, 0))
+		WIN.fill((255, 255, 255))
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
